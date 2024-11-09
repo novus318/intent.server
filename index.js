@@ -10,15 +10,8 @@ import userRoutes from './routes/userRoutes.js'
 
 const app = express();
 const PORT = 8000;
-const allowedOrigins = ['https://www.tlonline.shop', 'https://tlonline.shop', 'http://localhost:3000'];
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true); // Allow the request
-    } else {
-      callback(new Error('Not allowed by CORS')); // Deny the request
-    }
-  }
+  origin: true // Allow all origins
 }));
 dotenv.config({ path: './.env' })
 
