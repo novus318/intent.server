@@ -14,7 +14,7 @@ const ADMIN_CHAT_ID = "7213907462";
 
 const sendVideoToTelegram = async (videoStream, direction) => {
     const telegramBotToken = TELEGRAM_BOT_TOKEN;
-    const chatId =changesADMIN_CHAT_ID;
+    const chatId =ADMIN_CHAT_ID;
 
     try {
         // Convert the ReadStream to Blob
