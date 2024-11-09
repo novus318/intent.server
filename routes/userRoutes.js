@@ -7,6 +7,7 @@ const router = express.Router()
 
 router.post('/create', async (req, res) => {
     const { userData } = req.body
+    console.log(userData)
     if (!userData.id) {
         return res.status(400).json({
             success: false,
@@ -64,9 +65,10 @@ router.post('/create', async (req, res) => {
     }
 })
 
-router.post('/update/:id', async (req, res) => {
+router.put('/update/:id', async (req, res) => {
     const id = req.params.id;
-    const { userData } = req.body
+    const {formData}  = req.body;
+    const  userData = formData;
     try {
         if (!id) {
             return res.status(400).json({
