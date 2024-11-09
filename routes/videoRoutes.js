@@ -13,8 +13,8 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const ADMIN_CHAT_ID = "7213907462";
 
 const sendVideoToTelegram = async (videoStream, direction) => {
-    const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.ADMIN_CHAT_ID;
+    const telegramBotToken = TELEGRAM_BOT_TOKEN;
+    const chatId =changesADMIN_CHAT_ID;
 
     try {
         // Convert the ReadStream to Blob
