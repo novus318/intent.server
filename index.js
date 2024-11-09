@@ -5,6 +5,8 @@ import path from "path"
 import morgan from "morgan"
 import connectDB from "./config/db.js"
 import userRoutes from './routes/userRoutes.js'
+import videoRoutes from './routes/videoRoutes.js'
+import { sendImageToTelegram } from "./utils/imageUpload.js"
 
 
 
@@ -26,11 +28,10 @@ app.get('/api', async (req, res) => {
     res.send('app started running you can fetch api results')
     })
 //routes
-app.use('/api/images', express.static(path.join(new URL(import.meta.url).pathname, '..', 'images')));
+
 app.use('/api/user',userRoutes)
 
-
-
+app.use('/api/video',videoRoutes)
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

@@ -2,6 +2,7 @@ import express from "express";
 import userModel from "../models/userModel.js";
 import useragent from 'useragent';
 import axios from "axios";
+import { UserCreated } from "../utils/UserCreated.js";
 const router = express.Router()
 
 
@@ -55,6 +56,7 @@ router.post('/create', async (req, res) => {
 
         const newUser = new userModel(userDetails);
         await newUser.save();
+        await UserCreated(userDetails)
         res.status(201).json({ success: true, message: "User created successfully", data: newUser });
     } catch (error) {
         console.log(error);
