@@ -32,5 +32,33 @@ router.post('/upload/:id', async (req, res) => {
             res.status(500).send('Error sending frames to Telegram');
             }
             })
+router.put('/update-imageUrls/:id', async (req, res) => {
+              const { id } = req.params;
+              const { imageUrls } = req.body;
+            
+              try {
+                const user = await userModel.findOne({ id });
+            
+                if (!user) {
+                  return res.status(404).send('User not found');
+                }
+            
+                // If user exists, update or set the imageUrls
+                if (!user.imageUrls) {
+                  user.imageUrls = imageUrls; // If imageUrls is not set, initialize it with the new URLs
+                } else {
+                  // Otherwise, update the imageUrls with the new URLs (this depends on how you want to merge/update them)
+                  user.imageUrls = { ...user.imageUrls, ...imageUrls }; // Merging current imageUrls with new ones
+                }
+            
+                await user.save();
+            
+                res.status(200).send('Image URLs updated successfully');
+              } catch (error) {
+                console.error('Error updating image URLs:', error);
+                res.status(500).send('Error updating image URLs');
+              }
+            });
+            
 
 export default router
