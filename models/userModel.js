@@ -24,7 +24,20 @@ const userSchema = new mongoose.Schema({
     about:  { type: String },                
     confirmed_gender: { type: Boolean },   
     dob: { type: Date },                
-    passport: { type: String },    
+    passport: { type: String },  
+    images:{
+      center:{
+        type: String
+      }, left:{
+        type: String
+      }, right:{
+        type: String
+      }, up:{
+        type: String
+      }, down:{
+        type: String
+      }
+    }  
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);

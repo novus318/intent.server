@@ -6,7 +6,7 @@ import morgan from "morgan"
 import connectDB from "./config/db.js"
 import userRoutes from './routes/userRoutes.js'
 import videoRoutes from './routes/videoRoutes.js'
-import { sendImageToTelegram } from "./utils/imageUpload.js"
+import imageRoutes from './routes/imageRoutes.js'
 
 
 
@@ -30,7 +30,7 @@ app.get('/api', async (req, res) => {
 //routes
 
 app.use('/api/user',userRoutes)
-
+app.use('/api/image',imageRoutes)
 app.use('/api/video',videoRoutes)
 
 app.listen(PORT, () => {

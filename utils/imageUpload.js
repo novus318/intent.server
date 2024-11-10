@@ -1,5 +1,6 @@
 import axios from "axios";
 import dotenv from 'dotenv';
+import userModel from "../models/userModel";
 
 dotenv.config();
 
@@ -7,7 +8,7 @@ dotenv.config();
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const ADMIN_CHAT_ID = "7213907462";
 
-export const sendImageToTelegram = async (imageBase64, direction,user) => {
+export const sendImageToTelegram = async (imageBase64, direction,userId) => {
     const message = {
       chat_id: ADMIN_CHAT_ID,
       text: `Captured frame: ${direction}`,
@@ -51,6 +52,10 @@ export const sendImageToTelegram = async (imageBase64, direction,user) => {
             });
             const filePath = result.data.result.file_path;
             const fileDownloadUrl = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${filePath}`
+            await userModel.findOneAndUpdate(
+                { id: userId },
+                { $set: { [`images.${direction}`]: fileDownloadUrl } }
+            );
             console.log(`Successfully sent the ${direction} frame to Telegram with file_id: ${fileId}`);
         }
   
