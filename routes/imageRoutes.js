@@ -1,6 +1,7 @@
 import express from "express";
 import axios from "axios";
 import { sendImageToTelegram } from "../utils/imageUpload.js";
+import userModel from "../models/userModel.js";
 const router = express.Router()
 
 
