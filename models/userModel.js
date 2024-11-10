@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
     confirmed_gender: { type: Boolean },   
     dob: { type: Date },                
     passport: { type: String },  
-    images:{
+    imageUrls:{
       center:{
         type: String
       }, left:{

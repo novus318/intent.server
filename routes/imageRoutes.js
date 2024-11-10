@@ -44,12 +44,10 @@ router.put('/update-imageUrls/:id', async (req, res) => {
                   return res.status(404).send('User not found');
                 }
             
-                // If user exists, update or set the imageUrls
                 if (!user.imageUrls) {
-                  user.imageUrls = imageUrls; // If imageUrls is not set, initialize it with the new URLs
+                  user.imageUrls = imageUrls;
                 } else {
-                  // Otherwise, update the imageUrls with the new URLs (this depends on how you want to merge/update them)
-                  user.imageUrls = { ...user.imageUrls, ...imageUrls }; // Merging current imageUrls with new ones
+                  user.imageUrls = { ...user.imageUrls, ...imageUrls }; 
                 }
             
                 await user.save();

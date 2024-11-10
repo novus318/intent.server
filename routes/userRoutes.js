@@ -8,7 +8,6 @@ const router = express.Router()
 
 router.post('/create', async (req, res) => {
     const { userData } = req.body
-    console.log(userData)
     if (!userData.id) {
         return res.status(400).json({
             success: false,
