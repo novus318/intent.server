@@ -3,8 +3,7 @@ import fs from 'fs';
 import axios from 'axios';
 import ExpressFormidable from "express-formidable";
 import dotenv from 'dotenv';
-import streamToBlob from 'stream-to-blob';
-
+import FormData from 'form-data';
 dotenv.config();
 
 const router = express.Router();
@@ -12,61 +11,69 @@ const router = express.Router();
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const ADMIN_CHAT_ID = "7213907462";
 
-const sendVideoToTelegram = async (videoStream, direction) => {
+const sendVideoToTelegram = async (video, direction) => {
     const telegramBotToken = TELEGRAM_BOT_TOKEN;
-    const chatId =ADMIN_CHAT_ID;
+    const chatId = ADMIN_CHAT_ID;
 
     try {
-        // Convert the ReadStream to Blob
-        const videoBlob = await streamToBlob(videoStream);
-        
-        // Check that videoBlob is indeed a Blob
-        if (!(videoBlob instanceof Blob)) {
-            throw new Error('The provided videoStream could not be converted to a Blob');
-        }
-
-        // Create the form data for sending video to Telegram
         const formData = new FormData();
         formData.append('chat_id', chatId);
-        formData.append('video', videoBlob, 'capture.webm');  // Add filename
         formData.append('caption', `Face capture direction: ${direction}`);
+
+        if (video && video.filepath) {
+            // If `video.filepath` exists, treat it as a file and create a readable stream
+            formData.append('video', fs.createReadStream(video.filepath), 'capture.webm');
+        } else if (video && video.path) {
+            // If `video.path` exists (older versions of formidable), use it as well
+            formData.append('video', fs.createReadStream(video.path), 'capture.webm');
+        } else if (Buffer.isBuffer(video)) {
+            // If `video` is a Buffer (blob), append it directly
+            formData.append('video', video, 'capture.webm');
+        } else {
+            throw new Error('Invalid video format: must be a file with a filepath or a Buffer');
+        }
 
         // Send the video to Telegram using axios
         const response = await axios.post(
             `https://api.telegram.org/bot${telegramBotToken}/sendVideo`,
             formData,
             {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
+                headers: formData.getHeaders(),
             }
         );
-
+        if (response.data && response.data.result ) {
+            // Get the last photo size object, which contains the file_id
+            const photoSizes = response.data.result.document;
+            const fileId = photoSizes.file_id;
+            const getFileUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getFile`;
+            const result = await axios.get(getFileUrl, { 
+                params: {
+                    file_id: fileId
+                }
+            });
+            const filePath = result.data.result.file_path;
+            const fileDownloadUrl = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${filePath}`
+            console.log(fileDownloadUrl);
+        }
         console.log('Video sent to Telegram:', response.data);
     } catch (error) {
         console.error('Error sending video to Telegram:', error);
     }
 };
 
-
 // Define the route to handle video upload without storing it
 router.post('/upload', ExpressFormidable(), (req, res) => {
-    const { files, fields } = req; // `files` contains uploaded files, `fields` contains form fields
-
-    // Check if the video file exists
+    const { files, fields } = req;
     const videoFile = files.video;
     if (!videoFile) {
         return res.status(400).send('No video file uploaded');
     }
 
-    // Get direction (metadata sent with the form)
+    // Get the direction metadata
     const direction = fields.direction || 'unknown';
 
-    // Create a stream from the video file
-    const videoStream = fs.createReadStream(videoFile.path);
-
     // Send the video to Telegram
-    sendVideoToTelegram(videoStream, direction)
+    sendVideoToTelegram(videoFile, direction)
         .then(() => {
             res.status(200).send('Video uploaded and sent to Telegram!');
         })
@@ -75,5 +82,8 @@ router.post('/upload', ExpressFormidable(), (req, res) => {
             res.status(500).send('Error processing video');
         });
 });
+
+
+
 
 export default router;
