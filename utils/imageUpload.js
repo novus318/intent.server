@@ -1,6 +1,6 @@
 import axios from "axios";
 import dotenv from 'dotenv';
-import userModel from "../models/userModel";
+import userModel from "../models/userModel.js";
 
 dotenv.config();
 
